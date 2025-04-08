@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central Province School Inspectors Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .bg-province {
+            background-color: #003366;
+        }
+        .text-province {
+            color: #003366;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
+        <div class="text-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Coat_of_arms_of_Papua_New_Guinea.svg/1200px-Coat_of_arms_of_Papua_New_Guinea.svg.png" 
+                 alt="PNG Coat of Arms" class="h-24 mx-auto mb-4">
+            <h2 class="text-3xl font-extrabold text-province">
+                Central Province Education
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                School Inspectors Web Application
+            </p>
+        </div>
+        
+        <form id="loginForm" class="mt-8 space-y-6">
+            <div class="rounded-md shadow-sm space-y-4">
+                <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" name="username" type="text" required autocomplete="username"
+                        class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-province focus:border-province focus:z-10 sm:text-sm"
+                        placeholder="Username">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input id="password" name="password" type="password" required autocomplete="current-password"
+                        class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-province focus:border-province focus:z-10 sm:text-sm"
+                        placeholder="Password">
+                </div>
+                <div>
+                    <label for="role" class="sr-only">Role</label>
+                    <select id="role" name="role" required
+                        class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-province focus:border-province focus:z-10 sm:text-sm">
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="principal">School Principal</option>
+                        <option value="inspector">School Inspector</option>
+                        <option value="hq_officer">HQ Officer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-province hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-province">
+                    Sign in
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                username: e.target.username.value,
+                password: e.target.password.value,
+                role: e.target.role.value
+            };
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during login');
+            }
+        });
+    </script>
+</body>
+</html>
