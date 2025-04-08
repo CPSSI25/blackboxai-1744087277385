@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Central Province Education</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .bg-province {
+            background-color: #003366;
+        }
+        .text-province {
+            color: #003366;
+        }
+        .sidebar {
+            transition: all 0.3s;
+        }
+        .active-nav-item {
+            background-color: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="sidebar bg-province text-white w-64 space-y-6 py-7 px-2 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition duration-200 ease-in-out">
+            <div class="text-white flex items-center space-x-2 px-4">
+                <i class="fas fa-school text-2xl"></i>
+                <span class="text-xl font-bold">Central Province</span>
+            </div>
+            <nav>
+                <div id="principalNav" class="hidden">
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload Reports</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-download"></i>
+                        <span>Download Circulars</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                    </a>
+                </div>
+
+                <div id="inspectorNav" class="hidden">
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>Review Applications</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Approve Leaves</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-file-signature"></i>
+                        <span>Inspection Reports</span>
+                    </a>
+                </div>
+
+                <div id="hqNav" class="hidden">
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Manage Accounts</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Audit Logs</span>
+                    </a>
+                    <a href="#" class="nav-item py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Generate Reports</span>
+                    </a>
+                </div>
+
+                <div class="border-t border-blue-800 mt-4 pt-4">
+                    <a href="/auth/logout" class="py-2 px-4 flex items-center space-x-2 rounded hover:bg-blue-800">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-64">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex justify-between items-center py-4 px-6">
+                    <button class="md:hidden text-gray-500 focus:outline-none" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="flex items-center space-x-4">
+                        <span id="welcomeMessage" class="font-medium"></span>
+                        <div class="w-8 h-8 rounded-full bg-province text-white flex items-center justify-center">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <div id="principalContent" class="hidden">
+                    <h1 class="text-2xl font-bold text-province mb-6">Principal Dashboard</h1>
+                    <!-- Principal-specific content will be loaded here -->
+                </div>
+
+                <div id="inspectorContent" class="hidden">
+                    <h1 class="text-2xl font-bold text-province mb-6">Inspector Dashboard</h1>
+                    <!-- Inspector-specific content will be loaded here -->
+                </div>
+
+                <div id="hqContent" class="hidden">
+                    <h1 class="text-2xl font-bold text-province mb-6">HQ Officer Dashboard</h1>
+                    <!-- HQ Officer-specific content will be loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication and load role-specific content
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/auth/check', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+
+                const user = await response.json();
+                document.getElementById('welcomeMessage').textContent = `Welcome, ${user.username}`;
+
+                // Show role-specific navigation and content
+                document.getElementById(`${user.role}Nav`).classList.remove('hidden');
+                document.getElementById(`${user.role}Content`).classList.remove('hidden');
+
+                // Set active nav item
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        document.querySelectorAll('.nav-item').forEach(i => 
+                            i.classList.remove('active-nav-item'));
+                        this.classList.add('active-nav-item');
+                    });
+                });
+
+                // Mobile menu toggle
+                document.getElementById('menuToggle').addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.toggle('-translate-x-full');
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = '/index.html';
+            }
+        });
+    </script>
+</body>
+</html>
